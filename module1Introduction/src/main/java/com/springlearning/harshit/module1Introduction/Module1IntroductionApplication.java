@@ -27,10 +27,10 @@ public class Module1IntroductionApplication implements CommandLineRunner {
 	/* 1. Constructor Injection - Preferred over field injection for DI because it helps in making the
 	notificationService field 'final' which makes it immutable.
 	2. Here, EmailNotificationService injected as that is annotated with primary.
-    3. Also, Here @Autowired - Not necessary here (but doesn't create issue if added).
-    4. Also, Here, Optional<NotificationService> makes it an optional bean. That means if bean isn't present in applicationContext,
+    3. @Autowired is not necessary here (but doesn't create issue if added).
+    4. Also Here, Optional<NotificationService> makes it an optional bean. That means if bean isn't present in applicationContext,
     null would be assigned.
-    5. @Nullable NotificationService would have done the same job here. */
+    5. @Nullable NotificationService would have done the same job here as Optional. */
 	public Module1IntroductionApplication(@Qualifier("smsNotification") Optional<NotificationService> notificationService) {
 		this.notificationService = notificationService;
 	}
