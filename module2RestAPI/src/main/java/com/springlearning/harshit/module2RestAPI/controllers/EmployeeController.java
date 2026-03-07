@@ -1,40 +1,49 @@
 package com.springlearning.harshit.module2RestAPI.controllers;
 
 import com.springlearning.harshit.module2RestAPI.dto.EmployeeDTO;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.springlearning.harshit.module2RestAPI.entities.EmployeeEntity;
+import com.springlearning.harshit.module2RestAPI.repositories.EmployeeRepository;
+import com.springlearning.harshit.module2RestAPI.services.EmployeeService;
+import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
+import java.util.List;
 
-/* @RestController annotation extends from @Controller annotation only.
-Only difference is @ResponseController has an additional @ResponseBody annotation.
-@ResponseBody tells Spring to skip ViewResolver mechanism and use HttpMessageConverters instead
-so that the java objects returned by controller method can be converted to required response format.
-DispatcherServlet detects @ResponseBody on method or @RestController on class via HandlerAdapter
-to decide response handling. */
 @RestController
+@RequestMapping("/employee")
 public class EmployeeController {
 
-    /* @RequestMapping annotation is used to map requests to controller methods.
-    It has various attributes to match by URL, HTTP methods, request parameters, headers & media types.
-    @GetMapping is same as @RequestMapping.
-    Only difference is @GetMapping inherently specifies the HTTP method as GET. */
+    /* If a class has only one constructor, @Autowired is NOT required — Spring injects dependencies automatically.
+       If a class has multiple constructors, @Autowired is REQUIRED to tell Spring which constructor to use.
+       Setter and field injection ALWAYS require @Autowired — there is no automatic rule for them.
+     */
+    private final EmployeeService employeeService;
 
-    /* Mentioning path attribute is optional here.
-    We could simply write @GetMapping("/getSecretMessage") here as well */
-    @GetMapping(path = "/getSecretMessage")
-    public String getMySecretMessaage() {
-        return "Secret Message : A2@7y2e7#235#@151";
+    public EmployeeController(EmployeeService employeeService) {
+        this.employeeService = employeeService;
     }
 
-    @GetMapping("/employees/{employeeId}")
-    /* @PathVariable binds the path segment {employeeId} to the method parameter.
-    The variable name in the method argument must match the path segment {employeeId} name and case.
-    The data type of the path segment {employeeId} determines the type received in the method (Long, String, etc.) */
-    public EmployeeDTO getEmployeeById(@PathVariable Long employeeId) {
-        return new EmployeeDTO(employeeId, "Harshit", "abc@gmail.com", 25, LocalDate.of(2024, 4, 2), true);
+    @GetMapping("/{employeeId}")
+    public EmployeeDTO getEmployeeById(@PathVariable(name = "employeeId") Long id) {
+        return employeeService.getEmployeeById(id);
     }
 
+    // Not necessary to provide a path here in GetMapping annotation.
+    @GetMapping
+    public List<EmployeeDTO> getAllEmployees(@RequestParam(required = false, name = "inputAge") Integer age,
+                                                @RequestParam(required = false) String sortBy) {
+        return employeeService.getAllEmployees();
+    }
+
+    /* @RequestBody binds the HTTP request body to a Java object,
+       allowing Spring to automatically deserialize JSON (or XML) into that object.
+    */
+    @PostMapping
+    public EmployeeDTO createNewEmployee(@RequestBody EmployeeDTO inputEmployee) {
+        return employeeService.createNewEmployee(inputEmployee);
+    }
+
+    @PutMapping
+    public String updateEmployeeById() {
+        return "Hello from put";
+    }
 }
