@@ -16,7 +16,8 @@ public class MapperConfig {
         private ModelMapper modelMapper
 
     This is because, Spring first performs dependency injection by type, so even if the bean name is getModelMapper,
-    it gets injected into ModelMapper modelMapper because the type 'ModelMapper' matches. */
+    it can be injected into any class using above mentioned way because the type 'ModelMapper' matches.
+    But in case of multiple bean definitions of type 'ModelMapper', we'll anyway need to provide names to those beans. */
     @Bean
     public ModelMapper getModelMapper() {
         return new ModelMapper();

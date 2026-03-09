@@ -1,5 +1,7 @@
 package com.springlearning.harshit.module2RestAPI.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.time.LocalDate;
 
 /* DTO (Data Transfer Object) is used to carry data between layers without exposing entity objects directly.
@@ -11,6 +13,19 @@ public class EmployeeDTO {
     private String email;
     private Integer age;
     private LocalDate dateOfJoining;
+
+    /* @JsonProperty is an annotation from Jackson.
+    It is used to control how Java fields are mapped to JSON properties during serialization and deserialization.
+
+    Serialization → Java Object ➜ JSON conversion
+    Deserialization → JSON ➜ Java Object conversion
+
+    @JsonProperty tells Jackson what name should be used in JSON for a field.
+
+    After adding this annotation, any name can be used for the java field (like -> private Boolean isActiveEmployee)
+    and jackson will map 'isActive' field of JSON to 'isActiveEmployee' of the java object.
+    */
+    @JsonProperty("isActive")
     private Boolean isActive;
 
     // Default Constructor
@@ -68,11 +83,11 @@ public class EmployeeDTO {
         this.dateOfJoining = dateOfJoining;
     }
 
-    public Boolean getActive() {
+    public Boolean getIsActive() {
         return isActive;
     }
 
-    public void setActive(Boolean active) {
+    public void setIsActive(Boolean active) {
         isActive = active;
     }
 }

@@ -1,12 +1,13 @@
 package com.springlearning.harshit.module2RestAPI.controllers;
 
 import com.springlearning.harshit.module2RestAPI.dto.EmployeeDTO;
-import com.springlearning.harshit.module2RestAPI.entities.EmployeeEntity;
-import com.springlearning.harshit.module2RestAPI.repositories.EmployeeRepository;
 import com.springlearning.harshit.module2RestAPI.services.EmployeeService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/employee")
@@ -22,28 +23,59 @@ public class EmployeeController {
         this.employeeService = employeeService;
     }
 
+    /* ResponseEntity is a class from Spring Framework used to represent the complete HTTP response returned by a REST API.
+    ResponseEntity helps you to control : HTTP Status Code(200,404 etc), Response Body(Data sent to client) & HTTP Headers.
+    So instead of just returning data, you return a complete HTTP response object. */
     @GetMapping("/{employeeId}")
-    public EmployeeDTO getEmployeeById(@PathVariable(name = "employeeId") Long id) {
-        return employeeService.getEmployeeById(id);
+    public ResponseEntity<EmployeeDTO> getEmployeeById(@PathVariable(name = "employeeId") Long id) {
+        EmployeeDTO employeeDTO = employeeService.getEmployeeById(id);
+        if(employeeDTO == null) {
+            return ResponseEntity.notFound().build();
+        }
+        else {
+            return ResponseEntity.ok(employeeDTO);
+        }
     }
 
     // Not necessary to provide a path here in GetMapping annotation.
     @GetMapping
-    public List<EmployeeDTO> getAllEmployees(@RequestParam(required = false, name = "inputAge") Integer age,
+    public ResponseEntity<List<EmployeeDTO>> getAllEmployees(@RequestParam(required = false, name = "inputAge") Integer age,
                                                 @RequestParam(required = false) String sortBy) {
-        return employeeService.getAllEmployees();
+        return ResponseEntity.ok(employeeService.getAllEmployees());
     }
 
     /* @RequestBody binds the HTTP request body to a Java object,
        allowing Spring to automatically deserialize JSON (or XML) into that object.
     */
     @PostMapping
-    public EmployeeDTO createNewEmployee(@RequestBody EmployeeDTO inputEmployee) {
-        return employeeService.createNewEmployee(inputEmployee);
+    public ResponseEntity<EmployeeDTO> createNewEmployee(@RequestBody EmployeeDTO inputEmployee) {
+        EmployeeDTO savedEmployee = employeeService.createNewEmployee(inputEmployee);
+        return new ResponseEntity<>(savedEmployee, HttpStatus.CREATED);
     }
 
-    @PutMapping
-    public String updateEmployeeById() {
-        return "Hello from put";
+    @PutMapping(path = "/{employeeId}")
+    public ResponseEntity<EmployeeDTO> updateEmployeeById(@PathVariable Long employeeId, @RequestBody EmployeeDTO employeeDTO) {
+        EmployeeDTO updatedEmployee = employeeService.updateEmployeeById(employeeId, employeeDTO);
+        if(updatedEmployee == null) return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(updatedEmployee);
     }
+
+    @DeleteMapping(path = "/{employeeId}")
+    public ResponseEntity<Boolean> deleteEmployeeById(@PathVariable Long employeeId) {
+        boolean gotDeleted = employeeService.deleteEmployeeById(employeeId);
+        if(gotDeleted) return ResponseEntity.ok(true);
+        return ResponseEntity.notFound().build();
+    }
+
+    @PatchMapping(path = "/{employeeId}")
+    public ResponseEntity<EmployeeDTO> updatePartialEmployeeById(@RequestBody Map<String, Object> updates, @PathVariable Long employeeId) {
+        EmployeeDTO employeeDTO = employeeService.updatePartialEmployeeById(updates, employeeId);
+        if(employeeDTO == null) return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(employeeDTO);
+    }
+
+
+    /* In Spring Boot, controller methods should be public so Spring can reliably map and invoke them for HTTP requests.
+    Methods with default or protected access may work but are not recommended,
+    while private methods usually cannot be mapped, causing the endpoint to fail (e.g 404) */
 }
