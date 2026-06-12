@@ -2,6 +2,7 @@ package com.springlearning.harshit.module2RestAPI.services;
 
 import com.springlearning.harshit.module2RestAPI.dto.EmployeeDTO;
 import com.springlearning.harshit.module2RestAPI.entities.EmployeeEntity;
+import com.springlearning.harshit.module2RestAPI.exceptions.ResourceNotFoundException;
 import com.springlearning.harshit.module2RestAPI.repositories.EmployeeRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -61,7 +62,9 @@ public class EmployeeService {
     }
 
     public EmployeeDTO updateEmployeeById(Long employeeId, EmployeeDTO employeeDTO) {
-        if(!existsByEmployeeId(employeeId)) return null;
+        if(!existsByEmployeeId(employeeId)) {
+            throw new ResourceNotFoundException("Employee Not Found with id : " + employeeId);
+        }
 
         EmployeeEntity employeeEntity = modelMapper.map(employeeDTO, EmployeeEntity.class);
         employeeEntity.setId(employeeId);
@@ -85,17 +88,22 @@ public class EmployeeService {
     }
 
     public boolean deleteEmployeeById(Long employeeId) {
-        if(!existsByEmployeeId(employeeId)) return false;
+        if(!existsByEmployeeId(employeeId)) {
+            throw new ResourceNotFoundException("Employee Not Found with id : " + employeeId);
+        }
         employeeRepository.deleteById(employeeId);
         return true;
     }
 
     public EmployeeDTO updatePartialEmployeeById(Map<String, Object> updates, Long employeeId) {
-        if(!existsByEmployeeId(employeeId)) return null;
+        if(!existsByEmployeeId(employeeId)) {
+            throw new ResourceNotFoundException("Employee Not Found with id : " + employeeId);
+        }
         EmployeeEntity employeeEntity = employeeRepository.findById(employeeId).get();
 
         // We'll use 'java reflection' to update only those fields of 'employee entity' which are passed in the request body by the client.
         updates.forEach((key, value) -> {
+            if(key == "salary") key = "salaryPerMonth";
             Field fieldToBeUpdated = ReflectionUtils.findField(EmployeeEntity.class, key);
             fieldToBeUpdated.setAccessible(true);
             ReflectionUtils.setField(fieldToBeUpdated, employeeEntity, value);

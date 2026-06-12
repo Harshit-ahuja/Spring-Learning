@@ -27,7 +27,7 @@ public class EmployeeDTO {
 
     @NotBlank(message = "Role of Employee cannot be blank")
 //    @Pattern(regexp = "^(ADMIN|USER)$", message = "Role of the Employee can either be ADMIN or USER")
-    @EmployeeRoleValidation
+    @EmployeeRoleValidation // Created this custom validation annotation that serves the same purpose as the annotation commented above
     private String role;
 
     @JsonProperty("salary")

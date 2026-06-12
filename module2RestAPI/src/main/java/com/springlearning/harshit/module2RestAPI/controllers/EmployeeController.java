@@ -1,6 +1,7 @@
 package com.springlearning.harshit.module2RestAPI.controllers;
 
 import com.springlearning.harshit.module2RestAPI.dto.EmployeeDTO;
+import com.springlearning.harshit.module2RestAPI.exceptions.ResourceNotFoundException;
 import com.springlearning.harshit.module2RestAPI.services.EmployeeService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 @RestController
 @RequestMapping("/employee")
@@ -31,7 +33,7 @@ public class EmployeeController {
     public ResponseEntity<EmployeeDTO> getEmployeeById(@PathVariable(name = "employeeId") Long id) {
         EmployeeDTO employeeDTO = employeeService.getEmployeeById(id);
         if(employeeDTO == null) {
-            return ResponseEntity.notFound().build();
+            throw new ResourceNotFoundException("Employee not found with id : " + id);
         }
         else {
             return ResponseEntity.ok(employeeDTO);
@@ -58,28 +60,43 @@ public class EmployeeController {
     }
 
     @PutMapping(path = "/{employeeId}")
-    public ResponseEntity<EmployeeDTO> updateEmployeeById(@PathVariable Long employeeId, @RequestBody EmployeeDTO employeeDTO) {
+    public ResponseEntity<EmployeeDTO> updateEmployeeById(@PathVariable Long employeeId, @RequestBody @Valid EmployeeDTO employeeDTO) {
         EmployeeDTO updatedEmployee = employeeService.updateEmployeeById(employeeId, employeeDTO);
-        if(updatedEmployee == null) return ResponseEntity.notFound().build();
         return ResponseEntity.ok(updatedEmployee);
     }
 
     @DeleteMapping(path = "/{employeeId}")
     public ResponseEntity<Boolean> deleteEmployeeById(@PathVariable Long employeeId) {
         boolean gotDeleted = employeeService.deleteEmployeeById(employeeId);
-        if(gotDeleted) return ResponseEntity.ok(true);
-        return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(true);
     }
 
     @PatchMapping(path = "/{employeeId}")
     public ResponseEntity<EmployeeDTO> updatePartialEmployeeById(@RequestBody Map<String, Object> updates, @PathVariable Long employeeId) {
         EmployeeDTO employeeDTO = employeeService.updatePartialEmployeeById(updates, employeeId);
-        if(employeeDTO == null) return ResponseEntity.notFound().build();
         return ResponseEntity.ok(employeeDTO);
     }
 
 
-    /* In Spring Boot, controller methods should be public so Spring can reliably map and invoke them for HTTP requests.
+    /* We can create ExceptionHandlers like this in a controller.
+       And this would mean that any Exception occurred in any method of this controller which is of type 'NoSuchElementException'
+       would be intercepted by this ExceptionHandler.
+       This ExceptionHandler would then send an Appropriate Error Message in the Response Entity.
+
+       However, creating recurring ExceptionHandlers of similar type in every controller is not recommended.
+       Therefore, we use @RestControllerAdvice (as used in GlobalExceptionHandler) in order to create ExceptionHandlers
+       that intercept Exceptions globally and hence we don't have to individually create ExceptionHandlers in every
+       controller class.
+
+          |-----------------------------------------------------------------------------------------|
+          | @ExceptionHandler(NoSuchElementException.class)                                         |
+          | public ResponseEntity<String> handleNoSuchElementException(NoSuchElementException e) {  |
+          |     return new ResponseEntity<>("Employee not found", HttpStatus.NOT_FOUND);            |
+          | }                                                                                       |
+          |_________________________________________________________________________________________|
+     */
+}
+
+/* In Spring Boot, controller methods should be public so Spring can reliably map and invoke them for HTTP requests.
     Methods with default or protected access may work but are not recommended,
     while private methods usually cannot be mapped, causing the endpoint to fail (e.g 404) */
-}
