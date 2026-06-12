@@ -24,7 +24,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
  * To standardize all API responses, this class needs:
  * 1. A way to be applied globally to controller responses
  *    (provided by @RestControllerAdvice)
- * 2. A way to inspect and modify the response body
+ * 2. A way to intercept and modify the response body
  *    (provided by implementing ResponseBodyAdvice)
  *
  * ResponseBodyAdvice is a Spring MVC extension point that allows modification
@@ -34,11 +34,6 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
  * for eligible controller responses during the response-writing phase.
  * This is part of Spring MVC response lifecycle and works only for controller request-processing pipeline.
  *
- *
- *
- *
- * This is why, even when we are just sending ResponseEntity.ok(employeeDTO) from the controller,
- * the API response in Postman is well wrapped in ApiResponse object automatically.
  */
 @RestControllerAdvice
 public class GlobalResponseHandler implements ResponseBodyAdvice<Object> {
@@ -136,6 +131,8 @@ public class GlobalResponseHandler implements ResponseBodyAdvice<Object> {
  *
  *  Hence, just returning ResponseEntity from the controller is enough and transformation to ApiResponse
  *  automatically occurs behind the scene.
+ *  This is why, even when we are just sending ResponseEntity.ok(employeeDTO) from the controller,
+ *  the API response in Postman is well wrapped in ApiResponse object automatically.
  *
  *
  *
