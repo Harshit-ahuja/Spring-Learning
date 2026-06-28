@@ -1,6 +1,8 @@
 package com.springlearning.harshit.module3HibernateAndSpringDataJPA.repositories;
 
 import com.springlearning.harshit.module3HibernateAndSpringDataJPA.entities.ProductEntity;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -29,6 +31,8 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Long> {
 
     List<ProductEntity> findByTitleContaining(String title);
 
+    List<ProductEntity> findByTitleContainingIgnoreCase(String title);
+
     Optional<ProductEntity> findByTitleAndPrice(String title, BigDecimal price);
 
 
@@ -41,4 +45,15 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Long> {
      */
     @Query("select e from ProductEntity e where e.title=?1 and e.quantity=?2") // Can write 'e.title=:title and e.quantity=:quantity' as well
     List<ProductEntity> findByTitleAndQuantity(String title, int quantity);
+
+
+    // Sorting
+    List<ProductEntity> findByOrderByPrice();
+
+    List<ProductEntity> findByOrderByTitleDesc();
+
+    List<ProductEntity> findBy(Sort sort);
+
+    // Paging
+    List<ProductEntity> findByTitleContainingIgnoreCase(String title, Pageable pageable);
 }

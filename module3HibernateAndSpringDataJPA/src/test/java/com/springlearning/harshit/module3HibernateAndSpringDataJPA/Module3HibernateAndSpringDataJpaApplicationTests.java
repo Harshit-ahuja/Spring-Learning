@@ -76,6 +76,12 @@ class Module3HibernateAndSpringDataJpaApplicationTests {
 		System.out.println(entities);
 	}
 
+	@Test
+	void testRepository_customMethodNames_7() {
+		List<ProductEntity> entities = productRepository.findByTitleContainingIgnoreCase("PaRLe");
+		System.out.println(entities);
+	}
+
 	/* For fetching single/unique entity instead of a list of entities,
 	   we need to make sure that the query or constraints that we are providing is going to give us
 	   a unique result only.
@@ -85,13 +91,13 @@ class Module3HibernateAndSpringDataJpaApplicationTests {
 	   Hence, any combination of title and price is going to provide a unique result only.
 	 */
 	@Test
-	void testRepository_customMethodNames_7() {
+	void testRepository_customMethodNames_8() {
 		Optional<ProductEntity> productEntity = productRepository.findByTitleAndPrice("Pepsi", BigDecimal.valueOf(14.4));
 		productEntity.ifPresent(System.out::println);
 	}
 
 	@Test
-	void testRepository_customMethodNames_8() {
+	void testRepository_customMethodNames_9() {
 		List<ProductEntity> entities = productRepository.findByTitleAndQuantity("Parle Candy", 3);
 		System.out.println(entities);
 	}
